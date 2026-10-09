@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ABSNT.</title>
+  
+  <!-- Apple Monogram Retro SVG Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%23000000'/><text x='50%25' y='65%25' font-family='Arial Black,Impact,sans-serif' font-weight='900' font-size='42' fill='%23ffffff' text-anchor='middle'>A.</text></svg>">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Google Fonts: Retro Bowlby One SC & Modern Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-black: #000000;
+      --surface-glass: rgba(18, 18, 22, 0.72);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-subtle: rgba(255, 255, 255, 0.05);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.65);
+      --text-tertiary: rgba(255, 255, 255, 0.38);
+      --accent-safe: #30d158;
+      --accent-warn: #ff9f0a;
+      --accent-danger: #ff453a;
+      --accent-blue: #0a84ff;
+      --apple-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    /* Derinlik katan ortam ışıkları (Ambient Light) */
+    .ambient-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(80px);
+      opacity: 0.45;
+    }
+    .glow-top {
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    }
+    .glow-bottom {
+      bottom: -150px;
+      right: 10%;
+      background: radial-gradient(circle, rgba(10, 132, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .brand-font {
+      font-family: 'Bowlby One SC', -apple-system, Impact, sans-serif;
+      letter-spacing: -0.05em;
+      transform: scaleY(1.08);
+      display: inline-block;
+      text-transform: uppercase;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    /* ========================================================
+       STICKY ULTRA-GLASS NAVBAR
+       ======================================================== */
+    .glass-navbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 14px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+    }
+    .nav-center-title {
+      font-size: 32px;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
+    .nav-actions {
+      position: absolute;
+      right: 18px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .nav-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--glass-subtle);
+      border: 0.5px solid var(--glass-border);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s var(--apple-spring);
+    }
+    .nav-icon-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* ========================================================
+       DYNAMIC ISLAND NOTIFICATION
+       ======================================================== */
+    #island-pill {
+      position: fixed;
+      top: calc(70px + env(safe-area-inset-top, 0px));
+      left: 50%;
+      transform: translateX(-50%) translateY(-90px) scale(0.94);
+      background: rgba(22, 22, 26, 0.94);
+      border: 0.5px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(35px) saturate(200%);
+      -webkit-backdrop-filter: blur(35px) saturate(200%);
+      padding: 10px 22px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 3000;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.8);
+      opacity: 0;
+      transition: all 0.42s var(--apple-spring);
+      pointer-events: none;
+      max-width: 90vw;
+    }
+    #island-pill.show {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .app-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 18px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ========================================================
+       APPLE LIVE ACTIVITY SMART WIDGET (CANLI DERS TAKİBİ)
+       ======================================================== */
+    .smart-widget {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 22px;
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      margin-bottom: 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .widget-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .widget-date-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .status-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-transform: uppercase;
+    }
+    .status-badge.live {
+      background: rgba(48, 209, 88, 0.15);
+      color: var(--accent-safe);
+      border: 0.5px solid rgba(48, 209, 88, 0.35);
+    }
+    .status-badge.upcoming {
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--accent-blue);
+      border: 0.5px solid rgba(10, 132, 255, 0.35);
+    }
+    .status-badge.done {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      border: 0.5px solid var(--glass-border);
+    }
+
+    .widget-main-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .widget-info {
+      flex: 1;
+    }
+    .widget-title {
+      font-size: 26px;
+      line-height: 1.15;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .widget-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .widget-tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Halka Gösterge */
+    .widget-ring-wrap {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+    .widget-ring-svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .widget-ring-bg {
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 6;
+      fill: none;
+    }
+    .widget-ring-progress {
+      stroke: var(--accent-blue);
+      stroke-width: 6;
+      stroke-linecap: round;
+      fill: none;
+      transition: stroke-dashoffset 0.6s var(--apple-spring), stroke 0.4s;
+    }
+    .widget-ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* ========================================================
+       SEGMENTED SLIDER (GÜN KAPSÜLÜ)
+       ======================================================== */
+    .segmented-wrapper {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border: 0.5px solid rgba(255, 255, 255, 0.09);
+      border-radius: 20px;
+      padding: 4px;
+      display: flex;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      margin-bottom: 18px;
+    }
+    #segment-slider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      height: calc(100% - 8px);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 16px;
+      transition: transform 0.36s var(--apple-spring), width 0.36s var(--apple-spring);
+      pointer-events: none;
+      z-index: 1;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    .segment-tab {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: color 0.25s ease;
+    }
+    .segment-tab.active {
+      color: #000000;
+    }
+
+    /* Arama ve Filtreleme Barları */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 14px 0 40px;
+      background: var(--glass-subtle);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-input:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .filter-toggle-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 14px;
+      background: var(--glass-subtle);
+      border: 0.5px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-toggle-btn.active {
+      background: rgba(255, 69, 58, 0.18);
+      color: var(--accent-danger);
+      border-color: rgba(255, 69, 58, 0.4);
+    }
+
+    /* Gün Başlığı & Ekle Butonu */
+    .view-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+    .view-info-bar h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .circle-add-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(255, 255, 255, 0.25);
+      transition: transform 0.2s var(--apple-spring), background 0.2s;
+    }
+    .circle-add-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ========================================================
+       DERS VE DEVAMSIZLIK KARTLARI (AKTİVİTE HALKASI İLE)
+       ======================================================== */
+    #courses-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 180px;
+    }
+    .course-card {
+      background: var(--surface-glass);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 18px 20px;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      transition: transform 0.25s var(--apple-spring), border-color 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .course-card:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+    .course-card.danger-card {
+      border-left: 3px solid var(--accent-danger);
+    }
+    .course-card.warn-card {
+      border-left: 3px solid var(--accent-warn);
+    }
+    .course-card.safe-card {
+      border-left: 3px solid var(--accent-safe);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .card-title-box h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .card-meta-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .mini-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .mini-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    /* Devamsızlık Alt Satırı */
+    .attendance-row {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .attendance-visual {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mini-meter-ring {
+      position: relative;
+      width: 38px;
+      height: 38px;
+    }
+    .mini-meter-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .mini-meter-bg {
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 4;
+      fill: none;
+    }
+    .mini-meter-val {
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+      transition: stroke-dashoffset 0.4s var(--apple-spring);
+    }
+
+    .attendance-texts {
+      display: flex;
+      flex-direction: column;
+    }
+    .absence-numbers {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .absence-numbers .big-num {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .absence-remaining {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .absence-remaining.warning { color: var(--accent-warn); font-weight: 600; }
+    .absence-remaining.danger { color: var(--accent-danger); font-weight: 700; }
+
+    .ios-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 2px;
+    }
+    .stepper-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 11px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .stepper-btn:active {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(0.9);
+    }
+    .stepper-divider {
+      width: 0.5px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* ========================================================
+       APPLE FROSTED BOTTOM SHEET (RUBBER-BAND SWIPE-TO-DISMISS)
+       ======================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 2200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.32s var(--apple-spring), visibility 0.32s;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .bottom-sheet {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(20, 20, 26, 0.75);
+      backdrop-filter: blur(45px) saturate(200%);
+      -webkit-backdrop-filter: blur(45px) saturate(200%);
+      border-top: 0.5px solid rgba(255, 255, 255, 0.28);
+      border-left: 0.5px solid rgba(255, 255, 255, 0.12);
+      border-right: 0.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 34px 34px 0 0;
+      padding: 10px 24px 38px;
+      box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.8);
+      transform: translateY(100%);
+      transition: transform 0.38s var(--apple-spring);
+      max-height: 92vh;
+      overflow-y: auto;
+      touch-action: pan-y;
+    }
+    .modal-backdrop.open .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle-zone {
+      width: 100%;
+      padding: 8px 0 16px;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .sheet-handle-bar {
+      width: 44px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.38);
+      border-radius: 3px;
+    }
+    .sheet-drag-hint {
+      font-size: 10.5px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+      width: 100%;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 12px;
+      width: 100%;
+    }
+    .glass-input, .glass-select {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 14.5px;
+      font-family: inherit;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+      display: block;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .glass-input:focus, .glass-select:focus {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .glass-select option { background: #1c1c1e; }
+    .glass-input::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 50px;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #000000;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.25s var(--apple-spring);
+      box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
+    }
+    .submit-btn:active { transform: scale(0.97); }
+
+    /* ========================================================
+       AUTH OVERLAY & SETTINGS MODAL
+       ======================================================== */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 2500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.4s var(--apple-spring), visibility 0.4s;
+    }
+    .auth-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface-glass);
+      border: 0.5px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 34px 26px;
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+    }
+    .auth-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 3px;
+      margin: 22px 0;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: 0.25s var(--apple-spring);
+    }
+    .auth-tab.active {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    /* Boş Durum (Empty State) */
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-tertiary);
+    }
+    .empty-state-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 10px;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-bottom"></div>
+
+  <!-- Dynamic Island Bildirimi -->
+  <div id="island-pill">
+    <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
+    <span id="island-text">Sistem devrede</span>
+  </div>
+
+  <!-- Sticky Frosted Ultra-Glass Navbar -->
+  <header class="glass-navbar">
+    <h1 class="brand-font nav-center-title" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">ABSNT.</h1>
+    <div class="nav-actions">
+      <button class="nav-icon-btn" onclick="openBackupModal()" title="Veri Yedekleme & Aktarım">
+        <i data-lucide="arrow-down-up" style="width: 17px; height: 17px;"></i>
+      </button>
+      <button class="nav-icon-btn" onclick="logoutUser()" title="Oturumu Kapat">
+        <i data-lucide="log-out" style="width: 17px; height: 17px;"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Giriş / Kayıt Modal Ekranı -->
+  <div class="auth-overlay" id="auth-screen">
+    <div class="auth-card">
+      <h1 class="brand-font" style="font-size: 40px; margin-bottom: 4px;">ABSNT.</h1>
+      <p style="font-size: 12px; color: var(--text-tertiary); letter-spacing: 0.05em;">AKILLI DERS & DEVAMSIZLIK MERKEZİ</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Giriş Yap</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Kayıt Ol</button>
+      </div>
+
+      <form id="auth-form">
+        <div class="form-group">
+          <input type="text" id="auth-username" class="glass-input" placeholder="Kullanıcı Adı" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <input type="password" id="auth-password" class="glass-input" placeholder="Şifre" required>
+        </div>
+        <button type="submit" class="submit-btn" id="auth-submit-btn">Giriş Yap</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ana Uygulama Gövdesi -->
+  <main class="app-container" id="app-content">
+
+    <!-- iOS CANLI ETKİNLİK SMART WIDGET -->
+    <section class="smart-widget" id="live-widget">
+      <div class="widget-top-meta">
+        <span class="widget-date-badge" id="widget-full-date">Yükleniyor...</span>
+        <span class="status-badge live" id="widget-status-badge">
+          <i data-lucide="radio" style="width: 12px; height: 12px;"></i>
+          <span id="widget-status-text">CANLI TAKİP</span>
+        </span>
+      </div>
+
+      <div class="widget-main-body">
+        <div class="widget-info">
+          <h2 class="brand-font widget-title" id="widget-course-title">Ders Yok</h2>
+          <div class="widget-tags" id="widget-course-tags">
+            <span class="widget-tag-item"><i data-lucide="calendar" style="width: 13px; height: 13px;"></i> Bugün kalan ders bulunmuyor</span>
+          </div>
+        </div>
+
+        <!-- Canlı İlerleme / Kalan Süre Halkası -->
+        <div class="widget-ring-wrap" id="widget-ring-container">
+          <svg class="widget-ring-svg" viewBox="0 0 64 64">
+            <circle class="widget-ring-bg" cx="32" cy="32" r="26"></circle>
+            <circle class="widget-ring-progress" id="widget-ring-circle" cx="32" cy="32" r="26" stroke-dasharray="163.36" stroke-dashoffset="163.36"></circle>
+          </svg>
+          <div class="widget-ring-center" id="widget-ring-label">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kayan Segment Gün Seçici -->
+    <nav class="segmented-wrapper" id="segmented-wrapper">
+      <div id="segment-slider"></div>
+      <button class="segment-tab active" data-day="1">PZT</button>
+      <button class="segment-tab" data-day="2">SAL</button>
+      <button class="segment-tab" data-day="3">ÇAR</button>
+      <button class="segment-tab" data-day="4">PER</button>
+      <button class="segment-tab" data-day="5">CUM</button>
+      <button class="segment-tab" data-day="6">CMT</button>
+      <button class="segment-tab" data-day="0">PAZ</button>
+    </nav>
+
+    <!-- Hızlı Filtre ve Arama Çubuğu -->
+    <div class="filter-bar">
+      <div class="search-input-wrap">
+        <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
+        <input type="text" id="course-search-input" class="search-input" placeholder="Ders veya sınıf ara..." oninput="onSearchChange()">
+      </div>
+      <button class="filter-toggle-btn" id="filter-risk-btn" onclick="toggleRiskFilter()">
+        <i data-lucide="alert-triangle" style="width: 15px; height: 15px;"></i>
+        <span>Kritikler</span>
+      </button>
+    </div>
+
+    <!-- Gün Başlığı & Yuvarlak '+' Butonu -->
+    <div class="view-info-bar">
+      <div>
+        <h2 id="day-name-heading">Pazartesi</h2>
+        <span id="day-course-count" style="font-size: 12px; color: var(--text-secondary);">0 Ders Planlandı</span>
+      </div>
+      <button class="circle-add-btn" onclick="openAddModal()" title="Yeni Ders Ekle">
+        <i data-lucide="plus" style="width: 22px; height: 22px;"></i>
+      </button>
+    </div>
+
+    <!-- Dersler Listesi -->
+    <section id="courses-container"></section>
+  </main>
+
+  <!-- ALTTAN AÇILAN RUBBER-BAND DERS MODALI (X TUŞSUZ) -->
+  <div class="modal-backdrop" id="course-modal" onclick="if(event.target===this) closeModal()">
+    <div class="bottom-sheet" id="sheet-card">
+      
+      <!-- Tutma & Kaydırma Çubuğu -->
+      <div class="sheet-handle-zone" id="sheet-handle">
+        <div class="sheet-handle-bar"></div>
+        <span class="sheet-drag-hint">Kapatmak için aşağı kaydır</span>
+      </div>
+      
+      <h3 id="modal-title" style="font-size: 19px; font-weight: 700; margin-bottom: 16px;">Ders Ekle</h3>
+
+      <form id="course-form">
+        <input type="hidden" id="course-id">
+        
+        <div class="form-group">
+          <label>Ders Adı</label>
+          <input type="text" id="course-name" class="glass-input" placeholder="Örn: Yapay Zeka" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Gün</label>
+            <select id="course-day" class="glass-select">
+              <option value="1">Pazartesi</option>
+              <option value="2">Salı</option>
+              <option value="3">Çarşamba</option>
+              <option value="4">Perşembe</option>
+              <option value="5">Cuma</option>
+              <option value="6">Cumartesi</option>
+              <option value="0">Pazar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Derslik / Konum</label>
+            <input type="text" id="course-room" class="glass-input" placeholder="Örn: D-302" required>
+          </div>
+        </div>
+
+        <!-- Simetrik Saat Grid Alanları -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Başlangıç</label>
+            <input type="time" id="course-start" class="glass-input" required>
+          </div>
+          <div class="form-group">
+            <label>Bitiş</label>
+            <input type="time" id="course-end" class="glass-input" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Devamsızlık Sınırı (Saat)</label>
+            <input type="number" id="course-max" class="glass-input" min="1" value="12" required>
+          </div>
+          <div class="form-group">
+            <label>Mevcut Devamsızlık</label>
+            <input type="number" id="course-absent" class="glass-input" min="0" value="0" required>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="modal-submit-btn">Dersi Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- VERİ YEDEKLEME / PAYLAŞIM SHEET -->
+  <div class="modal-backdrop" id="backup-modal" onclick="if(event.target===this) closeBackupModal()">
+    <div class="bottom-sheet">
+      <div class="sheet-handle-zone" onclick="closeBackupModal()">
+        <div class="sheet-handle-bar"></div>
+        <span class="sheet-drag-hint">Kapat</span>
+      </div>
+      
+      <h3 style="font-size: 19px; font-weight: 700; margin-bottom: 8px;">Veri & Cihaz Aktarımı</h3>
+      <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">
+        Ders programını iPad veya başka bir cihaza taşımak için tek tıkla kopyalayabilir veya içe aktarabilirsin.
+      </p>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+        <button class="submit-btn" style="margin-top: 0;" onclick="exportDataToClipboard()">
+          Panoya Kopyala
+        </button>
+        <button class="submit-btn" style="margin-top: 0; background: var(--glass-subtle); color: #fff; border: 0.5px solid var(--glass-border);" onclick="importDataFromPrompt()">
+          İçe Aktar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DAY_MAP = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma", 6: "Cumartesi", 0: "Pazar" };
+    
+    // Varsayılan zengin üniversite ders programı
+    const DEFAULT_COURSES = [
+      { id: '1', name: 'Yazılım Mimarisi', day: 1, room: 'Amfi-1', start: '09:00', end: '11:45', max: 14, absent: 2 },
+      { id: '2', name: 'Veri Tabanı Sistemleri', day: 1, room: 'Lab-3', start: '13:00', end: '15:30', max: 10, absent: 8 },
+      { id: '3', name: 'Ağ Güvenliği', day: 2, room: 'C-102', start: '10:00', end: '12:30', max: 8, absent: 1 },
+      { id: '4', name: 'İşletim Sistemleri', day: 3, room: 'B-204', start: '14:00', end: '16:45', max: 12, absent: 11 },
+      { id: '5', name: 'Mobil Tasarım', day: 4, room: 'Mac Lab', start: '09:30', end: '12:15', max: 12, absent: 4 },
+      { id: '6', name: 'Yapay Zeka', day: 5, room: 'D-301', start: '11:00', end: '13:30', max: 10, absent: 0 }
+    ];
+
+    let currentAuthMode = 'login';
+    let currentUser = localStorage.getItem('absnt_active_user') || 'demo';
+    let selectedDay = new Date().getDay();
+    let filterCriticalOnly = false;
+    let searchQuery = '';
+    let notifiedLessonsToday = new Set();
+    let audioCtx = null;
+
+    // Apple Haptic & Audio Feedback
+    function triggerHaptic(type = 'light') {
+      if (window.navigator && window.navigator.vibrate) {
+        if (type === 'light') window.navigator.vibrate(8);
+        else if (type === 'medium') window.navigator.vibrate(20);
+        else if (type === 'warn') window.navigator.vibrate([30, 50, 30]);
+      }
+      playAppleAudio(type);
+    }
+
+    function playAppleAudio(type = 'light') {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'light') {
+          osc.frequency.setValueAtTime(1400, now);
+          osc.frequency.exponentialRampToValueAtTime(400, now + 0.025);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+          osc.start(now);
+          osc.stop(now + 0.025);
+        } else if (type === 'warn') {
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.setValueAtTime(860, now + 0.08);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        }
+      } catch (e) {}
+    }
+
+    function showIsland(msg) {
+      const p = document.getElementById('island-pill');
+      document.getElementById('island-text').innerText = msg;
+      p.classList.add('show');
+      triggerHaptic('warn');
+      setTimeout(() => p.classList.remove('show'), 3400);
+    }
+
+    // ========================================================
+    // OTURUM YÖNETİMİ
+    // ========================================================
+    function switchAuthTab(mode) {
+      triggerHaptic('light');
+      currentAuthMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+      document.getElementById('auth-submit-btn').innerText = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+    }
+
+    document.getElementById('auth-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      triggerHaptic('light');
+      const u = document.getElementById('auth-username').value.trim();
+      const p = document.getElementById('auth-password').value;
+      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+
+      if (currentAuthMode === 'register') {
+        if (db[u]) {
+          showIsland('Bu kullanıcı adı zaten kayıtlı!');
+          return;
+        }
+        db[u] = { password: p, courses: DEFAULT_COURSES };
+        localStorage.setItem('absnt_db', JSON.stringify(db));
+        currentUser = u;
+        localStorage.setItem('absnt_active_user', u);
+        initSession();
+      } else {
+        if (!db[u] || db[u].password !== p) {
+          showIsland('Hatalı kullanıcı adı veya şifre!');
+          return;
+        }
+        currentUser = u;
+        localStorage.setItem('absnt_active_user', u);
+        initSession();
+      }
+    });
+
+    function logoutUser() {
+      triggerHaptic('light');
+      localStorage.removeItem('absnt_active_user');
+      currentUser = null;
+      document.getElementById('auth-screen').classList.remove('hidden');
+      showIsland('Oturum kapatıldı');
+    }
+
+    function initSession() {
+      document.getElementById('auth-screen').classList.add('hidden');
+      updateSegmentSlider();
+      renderCourses();
+      updateSmartWidget();
+
+      // Bildirim izni isteme
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            showIsland("Bildirimler aktif! (10 dk önce uyarılacaksın)");
+          }
+        });
+      }
+    }
+
+    function getUserCourses() {
+      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+      if (!db['demo']) {
+        db['demo'] = { password: '123', courses: DEFAULT_COURSES };
+        localStorage.setItem('absnt_db', JSON.stringify(db));
+      }
+      return (db[currentUser] && db[currentUser].courses) || [];
+    }
+
+    function saveUserCourses(courses) {
+      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+      if (!db[currentUser]) {
+        db[currentUser] = { password: '', courses: [] };
+      }
+      db[currentUser].courses = courses;
+      localStorage.setItem('absnt_db', JSON.stringify(db));
+      updateSmartWidget();
+    }
+
+    // ========================================================
+    // CANLI SMART WIDGET MOTORU (CANLI DERS & GERİ SAYIM)
+    // ========================================================
+    function updateSmartWidget() {
+      const now = new Date();
+      const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
+      document.getElementById('widget-full-date').innerText = now.toLocaleDateString('tr-TR', options).toUpperCase();
+
+      const todayCourses = getUserCourses().filter(c => Number(c.day) === now.getDay());
+      const curMinutes = now.getHours() * 60 + now.getMinutes();
+
+      const titleEl = document.getElementById('widget-course-title');
+      const tagsEl = document.getElementById('widget-course-tags');
+      const badgeEl = document.getElementById('widget-status-badge');
+      const badgeText = document.getElementById('widget-status-text');
+      const ringCircle = document.getElementById('widget-ring-circle');
+      const ringLabel = document.getElementById('widget-ring-label');
+
+      // Çevre uzunluğu = 2 * PI * 26 ≈ 163.36
+      const CIRCLE_CIRCUMFERENCE = 163.36;
+
+      // 1. O an devam eden bir ders var mı?
+      const ongoing = todayCourses.find(c => {
+        const [sh, sm] = c.start.split(':').map(Number);
+        const [eh, em] = c.end.split(':').map(Number);
+        const startMin = sh * 60 + sm;
+        const endMin = eh * 60 + em;
+        return curMinutes >= startMin && curMinutes < endMin;
+      });
+
+      if (ongoing) {
+        const [sh, sm] = ongoing.start.split(':').map(Number);
+        const [eh, em] = ongoing.end.split(':').map(Number);
+        const startMin = sh * 60 + sm;
+        const endMin = eh * 60 + em;
+        const totalDuration = endMin - startMin;
+        const elapsed = curMinutes - startMin;
+        const remaining = endMin - curMinutes;
+        const progress = Math.min(1, Math.max(0, elapsed / totalDuration));
+
+        badgeEl.className = 'status-badge live';
+        badgeText.innerText = 'ŞU AN DERSTE';
+        titleEl.innerText = ongoing.name;
+        tagsEl.innerHTML = `
+          <span class="widget-tag-item"><i data-lucide="clock" style="width:13px; height:13px;"></i> ${ongoing.start} - ${ongoing.end} (Bitişe ${remaining} dk)</span>
+          <span class="widget-tag-item"><i data-lucide="map-pin" style="width:13px; height:13px;"></i> ${escapeHtml(ongoing.room)}</span>
+        `;
+
+        ringCircle.style.stroke = 'var(--accent-safe)';
+        const offset = CIRCLE_CIRCUMFERENCE - (progress * CIRCLE_CIRCUMFERENCE);
+        ringCircle.style.strokeDashoffset = offset;
+        ringLabel.innerText = `${remaining}m`;
+        lucide.createIcons();
+        return;
+      }
+
+      // 2. Bugün sırada bekleyen en yakın ders var mı?
+      const upcoming = todayCourses
+        .map(c => {
+          const [h, m] = c.start.split(':').map(Number);
+          return { ...c, startMin: h * 60 + m };
+        })
+        .filter(c => c.startMin > curMinutes)
+        .sort((a, b) => a.startMin - b.startMin);
+
+      if (upcoming.length > 0) {
+        const next = upcoming[0];
+        const diff = next.startMin - curMinutes;
+
+        badgeEl.className = 'status-badge upcoming';
+        badgeText.innerText = 'SIRADAKİ DERS';
+        titleEl.innerText = next.name;
+        tagsEl.innerHTML = `
+          <span class="widget-tag-item"><i data-lucide="clock" style="width:13px; height:13px;"></i> ${next.start} (${diff} dk kaldı)</span>
+          <span class="widget-tag-item"><i data-lucide="map-pin" style="width:13px; height:13px;"></i> ${escapeHtml(next.room)}</span>
+        `;
+
+        ringCircle.style.stroke = 'var(--accent-blue)';
+        // 60 dk üzerinden geri sayım oranı
+        const ratio = Math.max(0, Math.min(1, 1 - (diff / 60)));
+        ringCircle.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE - (ratio * CIRCLE_CIRCUMFERENCE);
+        ringLabel.innerText = diff > 60 ? `${Math.floor(diff/60)}s` : `${diff}m`;
+        lucide.createIcons();
+        return;
+      }
+
+      // 3. Ders kalmadı
+      badgeEl.className = 'status-badge done';
+      badgeText.innerText = 'TAMAMLANDI';
+      titleEl.innerText = 'Ders Yok';
+      tagsEl.innerHTML = `<span>Bugünün tüm dersleri bitti veya ders planlanmadı.</span>`;
+      ringCircle.style.stroke = 'rgba(255, 255, 255, 0.2)';
+      ringCircle.style.strokeDashoffset = CIRCLE_CIRCUMFERENCE;
+      ringLabel.innerText = '✓';
+      lucide.createIcons();
+    }
+
+    // ========================================================
+    // SEGMENTED DAY CONTROL
+    // ========================================================
+    function updateSegmentSlider() {
+      const activeBtn = document.querySelector(`.segment-tab[data-day="${selectedDay}"]`);
+      const slider = document.getElementById('segment-slider');
+      if (activeBtn && slider) {
+        slider.style.width = `${activeBtn.offsetWidth}px`;
+        slider.style.transform = `translateX(${activeBtn.offsetLeft - 4}px)`;
+      }
+    }
+
+    document.querySelectorAll('.segment-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        triggerHaptic('light');
+        document.querySelectorAll('.segment-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        selectedDay = Number(tab.dataset.day);
+        updateSegmentSlider();
+        renderCourses();
+      });
+    });
+
+    // ========================================================
+    // DERS LİSTELEME & RENK KODLU RİSK HALKALARI
+    // ========================================================
+    function onSearchChange() {
+      searchQuery = document.getElementById('course-search-input').value.trim().toLowerCase();
+      renderCourses();
+    }
+
+    function toggleRiskFilter() {
+      triggerHaptic('light');
+      filterCriticalOnly = !filterCriticalOnly;
+      document.getElementById('filter-risk-btn').classList.toggle('active', filterCriticalOnly);
+      renderCourses();
+    }
+
+    function renderCourses() {
+      let list = getUserCourses().filter(c => Number(c.day) === Number(selectedDay));
+      
+      // Arama Filtresi
+      if (searchQuery) {
+        list = list.filter(c => c.name.toLowerCase().includes(searchQuery) || c.room.toLowerCase().includes(searchQuery));
+      }
+
+      // Kritik Durum Filtresi (Kalan ders <= 3 veya taşmış olanlar)
+      if (filterCriticalOnly) {
+        list = list.filter(c => (c.max - c.absent) <= 3);
+      }
+
+      document.getElementById('day-name-heading').innerText = DAY_MAP[selectedDay];
+      document.getElementById('day-course-count').innerText = `${list.length} Ders Listeleniyor`;
+      const container = document.getElementById('courses-container');
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i data-lucide="coffee" class="empty-state-icon"></i>
+            <p style="font-size: 14.5px; font-weight: 600; color: #fff;">Bu günde ders bulunmuyor</p>
+            <p style="font-size: 12px; margin-top: 4px;">Sağ üstteki '+' butonuyla programa ders ekleyebilirsin.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      list.sort((a, b) => a.start.localeCompare(b.start));
+      const MINI_CIRCUMFERENCE = 94.24; // 2 * PI * 15
+
+      container.innerHTML = list.map(c => {
+        const remaining = c.max - c.absent;
+        const ratio = Math.min(1, Math.max(0, c.absent / c.max));
+        const offset = MINI_CIRCUMFERENCE - (ratio * MINI_CIRCUMFERENCE);
+
+        let riskClass = 'safe-card';
+        let strokeColor = 'var(--accent-safe)';
+        let statusText = `${remaining} saat hakkın kaldı`;
+        let textClass = '';
+
+        if (remaining <= 0) {
+          riskClass = 'danger-card';
+          strokeColor = 'var(--accent-danger)';
+          statusText = `Sınır aşıldı! (${Math.abs(remaining)} sa fazla)`;
+          textClass = 'danger';
+        } else if (remaining <= 3) {
+          riskClass = 'warn-card';
+          strokeColor = 'var(--accent-warn)';
+          statusText = `Kritik sınır! Son ${remaining} sa`;
+          textClass = 'warning';
+        }
+
+        return `
+          <article class="course-card ${riskClass}">
+            <div class="card-head">
+              <div class="card-title-box">
+                <h3>${escapeHtml(c.name)}</h3>
+                <div class="card-meta">
+                  <span class="card-meta-tag">
+                    <i data-lucide="clock" style="width: 13px; height: 13px;"></i>
+                    ${c.start} - ${c.end}
+                  </span>
+                  <span class="card-meta-tag">
+                    <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i>
+                    ${escapeHtml(c.room)}
+                  </span>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button class="mini-btn" onclick="openEditModal('${c.id}')" title="Düzenle">
+                  <i data-lucide="pencil" style="width: 15px; height: 15px;"></i>
+                </button>
+                <button class="mini-btn" onclick="deleteCourse('${c.id}')" title="Sil">
+                  <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="attendance-row">
+              <div class="attendance-visual">
+                <!-- Mini Risk Halkası -->
+                <div class="mini-meter-ring">
+                  <svg viewBox="0 0 38 38">
+                    <circle class="mini-meter-bg" cx="19" cy="19" r="15"></circle>
+                    <circle class="mini-meter-val" cx="19" cy="19" r="15" 
+                      stroke="${strokeColor}" 
+                      stroke-dasharray="94.24" 
+                      stroke-dashoffset="${offset}"></circle>
+                  </svg>
+                </div>
+                <div class="attendance-texts">
+                  <div class="absence-numbers">
+                    Devamsızlık: <span class="big-num">${c.absent}</span> / ${c.max} sa
+                  </div>
+                  <span class="absence-remaining ${textClass}">${statusText}</span>
+                </div>
+              </div>
+
+              <div class="ios-stepper">
+                <button class="stepper-btn" onclick="stepAbsent('${c.id}', -1)" title="Azalt">
+                  <i data-lucide="minus" style="width: 15px; height: 15px;"></i>
+                </button>
+                <div class="stepper-divider"></div>
+                <button class="stepper-btn" onclick="stepAbsent('${c.id}', 1)" title="Artır">
+                  <i data-lucide="plus" style="width: 15px; height: 15px;"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // ========================================================
+    // RUBBER-BAND SWIPE-TO-DISMISS MODAL MEKANİĞİ
+    // ========================================================
+    const modalBackdrop = document.getElementById('course-modal');
+    const sheetCard = document.getElementById('sheet-card');
+    const sheetHandle = document.getElementById('sheet-handle');
+
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    function openAddModal() {
+      triggerHaptic('light');
+      document.getElementById('course-form').reset();
+      document.getElementById('course-id').value = '';
+      document.getElementById('modal-title').innerText = 'Ders Ekle';
+      document.getElementById('course-day').value = selectedDay;
+      sheetCard.style.transform = '';
+      modalBackdrop.classList.add('open');
+    }
+
+    function openEditModal(id) {
+      triggerHaptic('light');
+      const c = getUserCourses().find(x => x.id === id);
+      if (!c) return;
+      document.getElementById('course-id').value = c.id;
+      document.getElementById('course-name').value = c.name;
+      document.getElementById('course-day').value = c.day;
+      document.getElementById('course-room').value = c.room;
+      document.getElementById('course-start').value = c.start;
+      document.getElementById('course-end').value = c.end;
+      document.getElementById('course-max').value = c.max;
+      document.getElementById('course-absent').value = c.absent;
+      document.getElementById('modal-title').innerText = 'Dersi Düzenle';
+      sheetCard.style.transform = '';
+      modalBackdrop.classList.add('open');
+    }
+
+    function closeModal() {
+      triggerHaptic('light');
+      modalBackdrop.classList.remove('open');
+      setTimeout(() => {
+        sheetCard.style.transform = '';
+      }, 350);
+    }
+
+    function handleDragStart(e) {
+      startY = e.touches ? e.touches[0].clientY : e.clientY;
+      isDragging = true;
+      sheetCard.style.transition = 'none';
+    }
+
+    function handleDragMove(e) {
+      if (!isDragging) return;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const deltaY = clientY - startY;
+
+      // Aşağı çekilirse normal takip et, yukarı çekilirse rubber-band direnç uygula
+      if (deltaY > 0) {
+        currentY = deltaY;
+        sheetCard.style.transform = `translateY(${deltaY}px)`;
+      } else {
+        // Yukarı direnç (Rubber-band physics)
+        currentY = deltaY * 0.2;
+        sheetCard.style.transform = `translateY(${currentY}px)`;
+      }
+    }
+
+    function handleDragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      sheetCard.style.transition = 'transform 0.38s var(--apple-spring)';
+
+      if (currentY > 90) {
+        closeModal();
+      } else {
+        sheetCard.style.transform = 'translateY(0)';
+      }
+      currentY = 0;
+    }
+
+    sheetHandle.addEventListener('touchstart', handleDragStart, { passive: true });
+    sheetHandle.addEventListener('touchmove', handleDragMove, { passive: true });
+    sheetHandle.addEventListener('touchend', handleDragEnd);
+
+    sheetHandle.addEventListener('mousedown', handleDragStart);
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+
+    // Form Gönderme
+    document.getElementById('course-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      triggerHaptic('medium');
+      const list = getUserCourses();
+      const id = document.getElementById('course-id').value || Date.now().toString();
+      const data = {
+        id,
+        name: document.getElementById('course-name').value.trim(),
+        day: Number(document.getElementById('course-day').value),
+        room: document.getElementById('course-room').value.trim(),
+        start: document.getElementById('course-start').value,
+        end: document.getElementById('course-end').value,
+        max: Number(document.getElementById('course-max').value),
+        absent: Number(document.getElementById('course-absent').value)
+      };
+
+      const idx = list.findIndex(c => c.id === id);
+      if (idx !== -1) list[idx] = data; else list.push(data);
+
+      saveUserCourses(list);
+      closeModal();
+      renderCourses();
+      showIsland('Ders başarıyla kaydedildi');
+    });
+
+    window.stepAbsent = function(id, delta) {
+      triggerHaptic('light');
+      const list = getUserCourses();
+      const item = list.find(c => c.id === id);
+      if (item) {
+        item.absent = Math.max(0, item.absent + delta);
+        saveUserCourses(list);
+        renderCourses();
+      }
+    };
+
+    window.deleteCourse = function(id) {
+      triggerHaptic('medium');
+      if (confirm('Bu dersi silmek istediğine emin misin?')) {
+        saveUserCourses(getUserCourses().filter(c => c.id !== id));
+        renderCourses();
+        showIsland('Ders silindi');
+      }
+    };
+
+    // ========================================================
+    // VERİ YEDEKLEME & DIŞA/İÇE AKTARMA (CİHAZLAR ARASI)
+    // ========================================================
+    function openBackupModal() {
+      triggerHaptic('light');
+      document.getElementById('backup-modal').classList.add('open');
+    }
+    function closeBackupModal() {
+      triggerHaptic('light');
+      document.getElementById('backup-modal').classList.remove('open');
+    }
+
+    function exportDataToClipboard() {
+      const data = JSON.stringify(getUserCourses(), null, 2);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(data).then(() => {
+          showIsland('Veriler panoya kopyalandı!');
+          closeBackupModal();
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = data;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showIsland('Veriler panoya kopyalandı!');
+        closeBackupModal();
+      }
+    }
+
+    function importDataFromPrompt() {
+      const jsonStr = prompt("Kopyaladığın JSON ders verisini buraya yapıştır:");
+      if (!jsonStr) return;
+      try {
+        const parsed = JSON.parse(jsonStr);
+        if (Array.isArray(parsed)) {
+          saveUserCourses(parsed);
+          renderCourses();
+          showIsland('Dersler başarıyla aktarıldı!');
+          closeBackupModal();
+        } else {
+          showIsland('Geçersiz veri formatı!');
+        }
+      } catch (e) {
+        showIsland('Hatalı JSON verisi!');
+      }
+    }
+
+    // ========================================================
+    // 10 DAKİKA ÖNCESİ MOTORU & CANLI SAAT GÜNCELLEMESİ
+    // ========================================================
+    setInterval(() => {
+      const now = new Date();
+      const curM = now.getHours() * 60 + now.getMinutes();
+
+      if (currentUser && Notification.permission === 'granted') {
+        getUserCourses().filter(c => Number(c.day) === now.getDay()).forEach(c => {
+          const [h, m] = c.start.split(':').map(Number);
+          const diff = (h * 60 + m) - curM;
+          const key = `${c.id}-${now.toDateString()}`;
+
+          if (diff === 10 && !notifiedLessonsToday.has(key)) {
+            notifiedLessonsToday.add(key);
+            new Notification("Ders Başlıyor", { body: `${c.name} 10 dakika sonra başlıyor! (${c.room})` });
+            showIsland(`Ders Başlıyor: ${c.name}`);
+          }
+        });
+      }
+      updateSmartWidget();
+    }, 15000);
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.segment-tab').forEach(t => {
+        t.classList.toggle('active', Number(t.dataset.day) === selectedDay);
+      });
+
+      if (currentUser) {
+        initSession();
+      } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+      }
+      lucide.createIcons();
+    });
+
+    window.addEventListener('resize', () => updateSegmentSlider());
+  </script>
+</body>
+</html>
