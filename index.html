@@ -1081,12 +1081,24 @@
       document.getElementById('auth-submit-btn').innerText = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
     }
 
+    function readDatabase() {
+      try {
+        const stored = localStorage.getItem('absnt_db');
+        const parsed = stored ? JSON.parse(stored) : {};
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+      } catch (error) {
+        console.warn('[v0] Geçersiz yerel veri temizleniyor:', error);
+        localStorage.removeItem('absnt_db');
+        return {};
+      }
+    }
+
     document.getElementById('auth-form').addEventListener('submit', (e) => {
       e.preventDefault();
       triggerHaptic('light');
       const u = document.getElementById('auth-username').value.trim();
       const p = document.getElementById('auth-password').value;
-      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+      let db = readDatabase();
 
       if (currentAuthMode === 'register') {
         if (db[u]) {
@@ -1134,7 +1146,7 @@
     }
 
     function getUserCourses() {
-      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+      let db = readDatabase();
       if (!db['demo']) {
         db['demo'] = { password: '123', courses: DEFAULT_COURSES };
         localStorage.setItem('absnt_db', JSON.stringify(db));
@@ -1144,7 +1156,7 @@
     }
 
     function saveUserCourses(courses) {
-      let db = JSON.parse(localStorage.getItem('absnt_db') || '{}');
+      let db = readDatabase();
       if (!db[currentUser]) {
         db[currentUser] = { password: '', courses: [] };
       }
