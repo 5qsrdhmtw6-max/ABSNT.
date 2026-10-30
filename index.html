@@ -1595,7 +1595,7 @@
       const now = new Date();
       const curM = now.getHours() * 60 + now.getMinutes();
 
-      if (currentUser && Notification.permission === 'granted') {
+      if (currentUser && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         getUserCourses().filter(c => Number(c.day) === now.getDay()).forEach(c => {
           const [h, m] = c.start.split(':').map(Number);
           const diff = (h * 60 + m) - curM;
