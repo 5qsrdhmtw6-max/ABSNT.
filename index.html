@@ -1139,7 +1139,8 @@
         db['demo'] = { password: '123', courses: DEFAULT_COURSES };
         localStorage.setItem('absnt_db', JSON.stringify(db));
       }
-      return (db[currentUser] && db[currentUser].courses) || [];
+      const courses = db[currentUser] && db[currentUser].courses;
+      return Array.isArray(courses) ? courses : [];
     }
 
     function saveUserCourses(courses) {
