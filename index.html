@@ -1152,7 +1152,8 @@
         localStorage.setItem('absnt_db', JSON.stringify(db));
       }
       const courses = db[currentUser] && db[currentUser].courses;
-      return Array.isArray(courses) ? courses : [];
+      if (!Array.isArray(courses)) return [];
+      return courses.filter(course => course && typeof course === 'object' && typeof course.start === 'string' && typeof course.end === 'string' && typeof course.name === 'string' && typeof course.room === 'string' && Number.isFinite(Number(course.day)));
     }
 
     function saveUserCourses(courses) {
